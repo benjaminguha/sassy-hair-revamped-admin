@@ -1,4 +1,6 @@
 
+import { Link } from "react-router-dom";
+
 interface FooterProps {
   siteSettings?: Record<string, string>;
 }
@@ -18,11 +20,12 @@ const Footer = ({ siteSettings }: FooterProps) => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
-              <li><a href="#home" className="text-gray-300 hover:text-pink-400 transition-colors">Home</a></li>
-              <li><a href="#services" className="text-gray-300 hover:text-pink-400 transition-colors">Services</a></li>
-              <li><a href="#about" className="text-gray-300 hover:text-pink-400 transition-colors">About</a></li>
-              <li><a href="#gallery" className="text-gray-300 hover:text-pink-400 transition-colors">Gallery</a></li>
-              <li><a href="#contact" className="text-gray-300 hover:text-pink-400 transition-colors">Contact</a></li>
+              <li><Link to="/" className="text-gray-300 hover:text-pink-400 transition-colors">Home</Link></li>
+              <li><Link to="/services" className="text-gray-300 hover:text-pink-400 transition-colors">Services</Link></li>
+              <li><Link to="/about" className="text-gray-300 hover:text-pink-400 transition-colors">About</Link></li>
+              <li><Link to="/gallery" className="text-gray-300 hover:text-pink-400 transition-colors">Gallery</Link></li>
+              <li><Link to="/collective" className="text-gray-300 hover:text-pink-400 transition-colors">The Sassy Collective</Link></li>
+              <li><Link to="/contact" className="text-gray-300 hover:text-pink-400 transition-colors">Contact</Link></li>
             </ul>
           </div>
           

@@ -57,6 +57,20 @@ const AdminLogin = () => {
     }
   };
 
+  // Quick access for the sassyadmin user
+  const handleQuickLogin = async () => {
+    setEmail("sassyadmin@sassyhair.com");
+    setPassword("sassyadmin#");
+    
+    // Auto-submit after setting values
+    setTimeout(() => {
+      const form = document.querySelector('form');
+      if (form) {
+        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }
+    }, 100);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
@@ -94,6 +108,16 @@ const AdminLogin = () => {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
+          
+          <div className="mt-4 pt-4 border-t">
+            <Button
+              onClick={handleQuickLogin}
+              variant="outline"
+              className="w-full text-sm"
+            >
+              Quick Login (Demo)
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

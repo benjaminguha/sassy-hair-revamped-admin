@@ -9,10 +9,12 @@ import CarouselManager from "@/components/admin/CarouselManager";
 import ServicesManager from "@/components/admin/ServicesManager";
 import GalleryManager from "@/components/admin/GalleryManager";
 import SettingsManager from "@/components/admin/SettingsManager";
+import AdminUserManager from "@/components/admin/AdminUserManager";
 
 const AdminDashboard = () => {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -24,7 +26,7 @@ const AdminDashboard = () => {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
-      navigate("/admin");
+      navigate("/hidden-admin-login");
       return;
     }
 
@@ -45,16 +47,17 @@ const AdminDashboard = () => {
         variant: "destructive",
       });
       await supabase.auth.signOut();
-      navigate("/admin");
+      navigate("/hidden-admin-login");
       return;
     }
 
     setIsAdmin(true);
+    setIsSuperAdmin(adminUser.role === 'super_admin');
   };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/admin");
+    navigate("/hidden-admin-login");
   };
 
   if (!isAdmin) {
@@ -85,11 +88,12 @@ const AdminDashboard = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="carousel" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
             <TabsTrigger value="carousel">Carousel</TabsTrigger>
             <TabsTrigger value="services">Services</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
+            {isSuperAdmin && <TabsTrigger value="admin-users">Admin Users</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="carousel">
@@ -107,6 +111,12 @@ const AdminDashboard = () => {
           <TabsContent value="settings">
             <SettingsManager />
           </TabsContent>
+
+          {isSuperAdmin && (
+            <TabsContent value="admin-users">
+              <AdminUserManager />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>
