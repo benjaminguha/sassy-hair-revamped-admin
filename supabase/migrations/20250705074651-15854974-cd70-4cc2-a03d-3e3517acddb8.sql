@@ -1,16 +1,20 @@
 
--- First, let's check if we need to create the admin user account
--- Insert the admin user into auth.users (this would normally be done through Supabase Auth)
--- Since we can't directly insert into auth.users, we need to create the user through the auth system first
 
--- For now, let's ensure the admin_users table has the correct structure
--- and insert a record that will match when the user signs up
+-- Update the admin_users table with the correct user ID
+-- The user has been created in Supabase Auth with ID: 1cf535e7-b1d7-42a6-a25b-a438c457aeb1
+UPDATE admin_users 
+SET user_id = '1cf535e7-b1d7-42a6-a25b-a438c457aeb1'
+WHERE email = 'sassyadmin@sassyhair.com';
+
+-- If the record doesn't exist, insert it
 INSERT INTO admin_users (user_id, email, role, is_active) 
 VALUES (
-  'auth-user-id-placeholder', 
+  '1cf535e7-b1d7-42a6-a25b-a438c457aeb1', 
   'sassyadmin@sassyhair.com', 
   'super_admin', 
   true
 ) ON CONFLICT (email) DO UPDATE SET
+  user_id = '1cf535e7-b1d7-42a6-a25b-a438c457aeb1',
   role = 'super_admin',
   is_active = true;
+
