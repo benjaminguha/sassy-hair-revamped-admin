@@ -28,37 +28,64 @@ const Admin = () => {
   }, []);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    console.log("🔍 Starting authentication check...");
     
-    if (!session) {
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log("📋 Session data:", session);
+      console.log("❌ Session error:", sessionError);
+      
+      if (!session) {
+        console.log("❌ No session found");
+        setIsCheckingAuth(false);
+        return;
+      }
+
+      console.log("✅ Session found, user ID:", session.user.id);
+      setUser(session.user);
+
+      // Check admin status
+      console.log("🔍 Checking admin status for user:", session.user.id);
+      const { data: adminUser, error } = await supabase
+        .from('admin_users')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .eq('is_active', true)
+        .single();
+
+      console.log("📋 Admin user data:", adminUser);
+      console.log("❌ Admin query error:", error);
+
+      if (error) {
+        console.log("❌ Error fetching admin data:", error.message);
+        await supabase.auth.signOut();
+        setIsCheckingAuth(false);
+        return;
+      }
+
+      if (!adminUser) {
+        console.log("❌ No admin user found");
+        await supabase.auth.signOut();
+        setIsCheckingAuth(false);
+        return;
+      }
+
+      console.log("✅ Admin user found:", adminUser);
+      setIsAdmin(true);
+      setIsSuperAdmin(adminUser.role === 'super_admin');
+      console.log("🎯 Is super admin:", adminUser.role === 'super_admin');
+      
+    } catch (err) {
+      console.log("💥 Exception in checkAuth:", err);
+    } finally {
       setIsCheckingAuth(false);
-      return;
     }
-
-    setUser(session.user);
-
-    // Check admin status
-    const { data: adminUser, error } = await supabase
-      .from('admin_users')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .eq('is_active', true)
-      .single();
-
-    if (error || !adminUser) {
-      await supabase.auth.signOut();
-      setIsCheckingAuth(false);
-      return;
-    }
-
-    setIsAdmin(true);
-    setIsSuperAdmin(adminUser.role === 'super_admin');
-    setIsCheckingAuth(false);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    console.log("🚀 Starting login process...");
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -66,12 +93,16 @@ const Admin = () => {
         password,
       });
 
+      console.log("📋 Login response data:", data);
+      console.log("❌ Login error:", error);
+
       if (error) {
         throw error;
       }
 
       // Check if user is an admin
       if (data.user) {
+        console.log("✅ Login successful, checking admin status...");
         const { data: adminUser, error: adminError } = await supabase
           .from('admin_users')
           .select('*')
@@ -79,7 +110,11 @@ const Admin = () => {
           .eq('is_active', true)
           .single();
 
+        console.log("📋 Admin check data:", adminUser);
+        console.log("❌ Admin check error:", adminError);
+
         if (adminError || !adminUser) {
+          console.log("❌ Access denied - not an admin");
           await supabase.auth.signOut();
           throw new Error("Access denied. Admin privileges required.");
         }
@@ -94,6 +129,7 @@ const Admin = () => {
         });
       }
     } catch (error: any) {
+      console.log("💥 Login failed:", error);
       toast({
         title: "Login failed",
         description: error.message,
@@ -111,6 +147,7 @@ const Admin = () => {
     setEmail(quickEmail);
     setPassword(quickPassword);
     setIsLoading(true);
+    console.log("⚡ Starting quick login...");
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -118,12 +155,16 @@ const Admin = () => {
         password: quickPassword,
       });
 
+      console.log("📋 Quick login response:", data);
+      console.log("❌ Quick login error:", error);
+
       if (error) {
         throw error;
       }
 
       // Check if user is an admin
       if (data.user) {
+        console.log("✅ Quick login successful, checking admin status...");
         const { data: adminUser, error: adminError } = await supabase
           .from('admin_users')
           .select('*')
@@ -131,7 +172,11 @@ const Admin = () => {
           .eq('is_active', true)
           .single();
 
+        console.log("📋 Quick login admin data:", adminUser);
+        console.log("❌ Quick login admin error:", adminError);
+
         if (adminError || !adminUser) {
+          console.log("❌ Quick login access denied");
           await supabase.auth.signOut();
           throw new Error("Access denied. Admin privileges required.");
         }
@@ -146,6 +191,7 @@ const Admin = () => {
         });
       }
     } catch (error: any) {
+      console.log("💥 Quick login failed:", error);
       toast({
         title: "Quick login failed",
         description: error.message,
