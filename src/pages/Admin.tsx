@@ -104,16 +104,53 @@ const Admin = () => {
   };
 
   const handleQuickLogin = async () => {
-    setEmail("sassyadmin@sassyhair.com");
-    setPassword("sassyadmin#");
+    const quickEmail = "sassyadmin@sassyhair.com";
+    const quickPassword = "sassyadmin#";
     
-    // Auto-submit after setting values
-    setTimeout(() => {
-      const form = document.querySelector('form');
-      if (form) {
-        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    setEmail(quickEmail);
+    setPassword(quickPassword);
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: quickEmail,
+        password: quickPassword,
+      });
+
+      if (error) throw error;
+
+      // Check if user is an admin
+      if (data.user) {
+        const { data: adminUser, error: adminError } = await supabase
+          .from('admin_users')
+          .select('*')
+          .eq('user_id', data.user.id)
+          .eq('is_active', true)
+          .single();
+
+        if (adminError || !adminUser) {
+          await supabase.auth.signOut();
+          throw new Error("Access denied. Admin privileges required.");
+        }
+
+        setUser(data.user);
+        setIsAdmin(true);
+        setIsSuperAdmin(adminUser.role === 'super_admin');
+        
+        toast({
+          title: "Quick login successful",
+          description: "Welcome to the admin panel!",
+        });
       }
-    }, 100);
+    } catch (error: any) {
+      toast({
+        title: "Quick login failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLogout = async () => {
@@ -180,8 +217,9 @@ const Admin = () => {
                 onClick={handleQuickLogin}
                 variant="outline"
                 className="w-full text-sm"
+                disabled={isLoading}
               >
-                Quick Login (Demo)
+                {isLoading ? "Logging in..." : "Quick Login (Demo)"}
               </Button>
             </div>
           </CardContent>
