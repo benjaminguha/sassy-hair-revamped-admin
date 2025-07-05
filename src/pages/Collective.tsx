@@ -52,7 +52,7 @@ const Collective = () => {
 
               <div className="text-center">
                 <a
-                  href={`mailto:${siteSettings?.contact_email || 'info@sassyhair.com'}?subject=Sassy Collective Inquiry`}
+                  href={`mailto:${(siteSettings as any)?.contact_email || 'info@sassyhair.com'}?subject=Sassy Collective Inquiry`}
                   className="inline-flex items-center px-8 py-4 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition-colors"
                 >
                   <Mail className="mr-2 h-5 w-5" />
