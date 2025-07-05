@@ -27,6 +27,7 @@ const Admin = () => {
       }
 
       setUser(session.user);
+      console.log("Current user:", session.user);
 
       // Check admin status
       const { data: adminUser, error } = await supabase
@@ -36,8 +37,12 @@ const Admin = () => {
         .eq('is_active', true)
         .single();
 
+      console.log("Admin check result:", { adminUser, error });
+
       if (!error && adminUser) {
         setIsAdmin(true);
+      } else {
+        console.log("Admin check failed:", error);
       }
     } catch (err) {
       console.error("Auth check failed:", err);
@@ -49,24 +54,38 @@ const Admin = () => {
     setIsLoading(true);
 
     try {
+      console.log("Attempting login with:", email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error("Login error:", error);
         throw error;
       }
 
       if (data.user) {
+        console.log("Login successful, user:", data.user);
+        
+        // Check admin status with detailed logging
         const { data: adminUser, error: adminError } = await supabase
           .from('admin_users')
           .select('*')
           .eq('user_id', data.user.id)
-          .eq('is_active', true)
-          .single();
+          .eq('is_active', true);
 
-        if (adminError || !adminUser) {
+        console.log("Admin lookup result:", { adminUser, adminError, userId: data.user.id });
+
+        if (adminError) {
+          console.error("Admin lookup error:", adminError);
+          await supabase.auth.signOut();
+          throw new Error(`Database error: ${adminError.message}`);
+        }
+
+        if (!adminUser || adminUser.length === 0) {
+          console.log("No admin user found for ID:", data.user.id);
           await supabase.auth.signOut();
           throw new Error("Access denied. Admin privileges required.");
         }
@@ -80,6 +99,7 @@ const Admin = () => {
         });
       }
     } catch (error: any) {
+      console.error("Login process error:", error);
       toast({
         title: "Login failed",
         description: error.message,
