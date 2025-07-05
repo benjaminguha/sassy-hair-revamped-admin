@@ -1,16 +1,10 @@
+
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import CarouselManager from "@/components/admin/CarouselManager";
-import ServicesManager from "@/components/admin/ServicesManager";
-import GalleryManager from "@/components/admin/GalleryManager";
-import SettingsManager from "@/components/admin/SettingsManager";
-import AdminUserManager from "@/components/admin/AdminUserManager";
 
 const Admin = () => {
   const [email, setEmail] = useState("");
@@ -18,9 +12,6 @@ const Admin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -28,24 +19,16 @@ const Admin = () => {
   }, []);
 
   const checkAuth = async () => {
-    console.log("🔍 Starting authentication check...");
-    
     try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      console.log("📋 Session data:", session);
-      console.log("❌ Session error:", sessionError);
+      const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        console.log("❌ No session found");
-        setIsCheckingAuth(false);
         return;
       }
 
-      console.log("✅ Session found, user ID:", session.user.id);
       setUser(session.user);
 
       // Check admin status
-      console.log("🔍 Checking admin status for user:", session.user.id);
       const { data: adminUser, error } = await supabase
         .from('admin_users')
         .select('*')
@@ -53,39 +36,17 @@ const Admin = () => {
         .eq('is_active', true)
         .single();
 
-      console.log("📋 Admin user data:", adminUser);
-      console.log("❌ Admin query error:", error);
-
-      if (error) {
-        console.log("❌ Error fetching admin data:", error.message);
-        await supabase.auth.signOut();
-        setIsCheckingAuth(false);
-        return;
+      if (!error && adminUser) {
+        setIsAdmin(true);
       }
-
-      if (!adminUser) {
-        console.log("❌ No admin user found");
-        await supabase.auth.signOut();
-        setIsCheckingAuth(false);
-        return;
-      }
-
-      console.log("✅ Admin user found:", adminUser);
-      setIsAdmin(true);
-      setIsSuperAdmin(adminUser.role === 'super_admin');
-      console.log("🎯 Is super admin:", adminUser.role === 'super_admin');
-      
     } catch (err) {
-      console.log("💥 Exception in checkAuth:", err);
-    } finally {
-      setIsCheckingAuth(false);
+      console.error("Auth check failed:", err);
     }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("🚀 Starting login process...");
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -93,16 +54,11 @@ const Admin = () => {
         password,
       });
 
-      console.log("📋 Login response data:", data);
-      console.log("❌ Login error:", error);
-
       if (error) {
         throw error;
       }
 
-      // Check if user is an admin
       if (data.user) {
-        console.log("✅ Login successful, checking admin status...");
         const { data: adminUser, error: adminError } = await supabase
           .from('admin_users')
           .select('*')
@@ -110,18 +66,13 @@ const Admin = () => {
           .eq('is_active', true)
           .single();
 
-        console.log("📋 Admin check data:", adminUser);
-        console.log("❌ Admin check error:", adminError);
-
         if (adminError || !adminUser) {
-          console.log("❌ Access denied - not an admin");
           await supabase.auth.signOut();
           throw new Error("Access denied. Admin privileges required.");
         }
 
         setUser(data.user);
         setIsAdmin(true);
-        setIsSuperAdmin(adminUser.role === 'super_admin');
         
         toast({
           title: "Login successful",
@@ -129,71 +80,8 @@ const Admin = () => {
         });
       }
     } catch (error: any) {
-      console.log("💥 Login failed:", error);
       toast({
         title: "Login failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleQuickLogin = async () => {
-    const quickEmail = "sassyadmin@sassyhair.com";
-    const quickPassword = "sassyadmin#";
-    
-    setEmail(quickEmail);
-    setPassword(quickPassword);
-    setIsLoading(true);
-    console.log("⚡ Starting quick login...");
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: quickEmail,
-        password: quickPassword,
-      });
-
-      console.log("📋 Quick login response:", data);
-      console.log("❌ Quick login error:", error);
-
-      if (error) {
-        throw error;
-      }
-
-      // Check if user is an admin
-      if (data.user) {
-        console.log("✅ Quick login successful, checking admin status...");
-        const { data: adminUser, error: adminError } = await supabase
-          .from('admin_users')
-          .select('*')
-          .eq('user_id', data.user.id)
-          .eq('is_active', true)
-          .single();
-
-        console.log("📋 Quick login admin data:", adminUser);
-        console.log("❌ Quick login admin error:", adminError);
-
-        if (adminError || !adminUser) {
-          console.log("❌ Quick login access denied");
-          await supabase.auth.signOut();
-          throw new Error("Access denied. Admin privileges required.");
-        }
-
-        setUser(data.user);
-        setIsAdmin(true);
-        setIsSuperAdmin(adminUser.role === 'super_admin');
-        
-        toast({
-          title: "Quick login successful",
-          description: "Welcome to the admin panel!",
-        });
-      }
-    } catch (error: any) {
-      console.log("💥 Quick login failed:", error);
-      toast({
-        title: "Quick login failed",
         description: error.message,
         variant: "destructive",
       });
@@ -206,20 +94,9 @@ const Admin = () => {
     await supabase.auth.signOut();
     setUser(null);
     setIsAdmin(false);
-    setIsSuperAdmin(false);
     setEmail("");
     setPassword("");
   };
-
-  if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Loading...</h2>
-        </div>
-      </div>
-    );
-  }
 
   // Show login form if not authenticated or not admin
   if (!isAdmin) {
@@ -260,17 +137,6 @@ const Admin = () => {
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
-            
-            <div className="mt-4 pt-4 border-t">
-              <Button
-                onClick={handleQuickLogin}
-                variant="outline"
-                className="w-full text-sm"
-                disabled={isLoading}
-              >
-                {isLoading ? "Logging in..." : "Quick Login (Demo)"}
-              </Button>
-            </div>
           </CardContent>
         </Card>
       </div>
@@ -295,37 +161,55 @@ const Admin = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="carousel" className="space-y-6">
-          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
-            <TabsTrigger value="carousel">Carousel</TabsTrigger>
-            <TabsTrigger value="services">Services</TabsTrigger>
-            <TabsTrigger value="gallery">Gallery</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-            {isSuperAdmin && <TabsTrigger value="admin-users">Admin Users</TabsTrigger>}
-          </TabsList>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Carousel Images</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">Manage hero carousel images</p>
+              <Button className="mt-4 bg-pink-600 hover:bg-pink-700">
+                Manage Carousel
+              </Button>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="carousel">
-            <CarouselManager />
-          </TabsContent>
+          <Card>
+            <CardHeader>
+              <CardTitle>Services</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">Manage salon services</p>
+              <Button className="mt-4 bg-pink-600 hover:bg-pink-700">
+                Manage Services
+              </Button>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="services">
-            <ServicesManager />
-          </TabsContent>
+          <Card>
+            <CardHeader>
+              <CardTitle>Gallery</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">Manage photo gallery</p>
+              <Button className="mt-4 bg-pink-600 hover:bg-pink-700">
+                Manage Gallery
+              </Button>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="gallery">
-            <GalleryManager />
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <SettingsManager />
-          </TabsContent>
-
-          {isSuperAdmin && (
-            <TabsContent value="admin-users">
-              <AdminUserManager />
-            </TabsContent>
-          )}
-        </Tabs>
+          <Card>
+            <CardHeader>
+              <CardTitle>Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">Manage site settings</p>
+              <Button className="mt-4 bg-pink-600 hover:bg-pink-700">
+                Manage Settings
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </main>
     </div>
   );
