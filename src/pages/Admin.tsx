@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,29 +28,38 @@ const Admin = () => {
   }, []);
 
   const checkAuth = async () => {
+    console.log("Checking auth...");
     const { data: { session } } = await supabase.auth.getSession();
+    console.log("Current session:", session);
     
     if (!session) {
+      console.log("No session found");
       setIsCheckingAuth(false);
       return;
     }
 
+    console.log("User ID:", session.user.id);
     setUser(session.user);
 
     // Check admin status
-    const { data: adminUser } = await supabase
+    console.log("Checking admin status for user:", session.user.id);
+    const { data: adminUser, error } = await supabase
       .from('admin_users')
       .select('*')
       .eq('user_id', session.user.id)
       .eq('is_active', true)
       .single();
 
-    if (!adminUser) {
+    console.log("Admin user query result:", { adminUser, error });
+
+    if (error || !adminUser) {
+      console.log("User is not an admin, signing out");
       await supabase.auth.signOut();
       setIsCheckingAuth(false);
       return;
     }
 
+    console.log("User is admin:", adminUser);
     setIsAdmin(true);
     setIsSuperAdmin(adminUser.role === 'super_admin');
     setIsCheckingAuth(false);
@@ -62,15 +70,22 @@ const Admin = () => {
     setIsLoading(true);
 
     try {
+      console.log("Attempting login with:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Login error:", error);
+        throw error;
+      }
+
+      console.log("Login successful:", data.user?.id);
 
       // Check if user is an admin
       if (data.user) {
+        console.log("Checking admin status for logged in user:", data.user.id);
         const { data: adminUser, error: adminError } = await supabase
           .from('admin_users')
           .select('*')
@@ -78,7 +93,10 @@ const Admin = () => {
           .eq('is_active', true)
           .single();
 
+        console.log("Admin check result:", { adminUser, adminError });
+
         if (adminError || !adminUser) {
+          console.log("User is not admin, signing out");
           await supabase.auth.signOut();
           throw new Error("Access denied. Admin privileges required.");
         }
@@ -93,6 +111,7 @@ const Admin = () => {
         });
       }
     } catch (error: any) {
+      console.error("Login failed:", error);
       toast({
         title: "Login failed",
         description: error.message,
@@ -107,6 +126,7 @@ const Admin = () => {
     const quickEmail = "sassyadmin@sassyhair.com";
     const quickPassword = "sassyadmin#";
     
+    console.log("Quick login attempt");
     setEmail(quickEmail);
     setPassword(quickPassword);
     setIsLoading(true);
@@ -117,10 +137,16 @@ const Admin = () => {
         password: quickPassword,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Quick login error:", error);
+        throw error;
+      }
+
+      console.log("Quick login successful:", data.user?.id);
 
       // Check if user is an admin
       if (data.user) {
+        console.log("Checking admin status for quick login user:", data.user.id);
         const { data: adminUser, error: adminError } = await supabase
           .from('admin_users')
           .select('*')
@@ -128,7 +154,10 @@ const Admin = () => {
           .eq('is_active', true)
           .single();
 
+        console.log("Quick login admin check result:", { adminUser, adminError });
+
         if (adminError || !adminUser) {
+          console.log("Quick login user is not admin, signing out");
           await supabase.auth.signOut();
           throw new Error("Access denied. Admin privileges required.");
         }
@@ -143,6 +172,7 @@ const Admin = () => {
         });
       }
     } catch (error: any) {
+      console.error("Quick login failed:", error);
       toast({
         title: "Quick login failed",
         description: error.message,
