@@ -1,4 +1,4 @@
 ---
 deployment:
   tasks:
-    - cp -R /home/s1052571/repositories/sassy-hair/* /home/s1052571/public_html/
+    - cp -a /home/s1052571/repositories/sassy-hair/. /home/s1052571/public_html/
