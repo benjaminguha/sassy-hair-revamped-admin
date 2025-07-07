@@ -22,6 +22,7 @@ const Footer = ({ siteSettings }: FooterProps) => {
             <ul className="space-y-2">
               <li><Link to="/" className="text-gray-300 hover:text-pink-400 transition-colors">Home</Link></li>
               <li><Link to="/services" className="text-gray-300 hover:text-pink-400 transition-colors">Services</Link></li>
+              <li><Link to="/stylists" className="text-gray-300 hover:text-pink-400 transition-colors">Stylists</Link></li>
               <li><Link to="/about" className="text-gray-300 hover:text-pink-400 transition-colors">About</Link></li>
               <li><Link to="/gallery" className="text-gray-300 hover:text-pink-400 transition-colors">Gallery</Link></li>
               <li><Link to="/collective" className="text-gray-300 hover:text-pink-400 transition-colors">The Sassy Collective</Link></li>

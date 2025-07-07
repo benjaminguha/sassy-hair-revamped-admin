@@ -65,6 +65,14 @@ const Navigation = () => {
               Services
             </Link>
             <Link
+              to="/stylists"
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                isActive("/stylists") ? "text-pink-600 bg-pink-50" : "text-gray-700 hover:text-pink-600"
+              }`}
+            >
+              Stylists
+            </Link>
+            <Link
               to="/gallery"
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 isActive("/gallery") ? "text-pink-600 bg-pink-50" : "text-gray-700 hover:text-pink-600"
@@ -140,6 +148,15 @@ const Navigation = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               Services
+            </Link>
+            <Link
+              to="/stylists"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                isActive("/stylists") ? "text-pink-600 bg-pink-50" : "text-gray-700 hover:text-pink-600"
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Stylists
             </Link>
             <Link
               to="/gallery"
