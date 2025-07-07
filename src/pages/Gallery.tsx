@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Instagram } from "lucide-react";
 
 const Gallery = () => {
   const { data: instagramPosts = [] } = useQuery({
@@ -34,6 +34,18 @@ const Gallery = () => {
     }
   });
 
+  const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = event.currentTarget;
+    img.style.display = 'none';
+    const parent = img.parentElement;
+    if (parent) {
+      const fallback = parent.querySelector('.fallback-content');
+      if (fallback) {
+        (fallback as HTMLElement).style.display = 'flex';
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
@@ -53,14 +65,26 @@ const Gallery = () => {
                   className="relative group overflow-hidden rounded-lg shadow-lg aspect-square bg-gray-200"
                 >
                   {post.image_url ? (
-                    <img
-                      src={post.image_url}
-                      alt={post.caption || "Instagram post"}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
+                    <>
+                      <img
+                        src={post.image_url}
+                        alt={post.caption || "Instagram post"}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={handleImageError}
+                      />
+                      <div className="fallback-content w-full h-full bg-gradient-to-br from-pink-400 to-purple-600 items-center justify-center hidden">
+                        <div className="text-center text-white">
+                          <Instagram className="w-8 h-8 mx-auto mb-2" />
+                          <span className="text-sm font-medium">Instagram Post</span>
+                        </div>
+                      </div>
+                    </>
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-pink-400 to-purple-600 flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">Instagram Post</span>
+                      <div className="text-center text-white">
+                        <Instagram className="w-8 h-8 mx-auto mb-2" />
+                        <span className="text-sm font-medium">Instagram Post</span>
+                      </div>
                     </div>
                   )}
                   
