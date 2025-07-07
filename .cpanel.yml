@@ -4,16 +4,9 @@ deployment:
     - export DEPLOYPATH=/home/s1052571/public_html/
     - export REPOPATH=/home/s1052571/repositories/sassy-hair/
     - export LOGFILE=${DEPLOYPATH}/deploy_log.txt
-    - echo "--- Deployment Log Started ---" > ${LOGFILE}
-    - date >> ${LOGFILE}
-    - echo " " >> ${LOGFILE}
-    - echo "--- Listing Source Repository Files (and permissions) ---" >> ${LOGFILE}
+    - echo "--- Log Start ---" > ${LOGFILE}
     - ls -la ${REPOPATH} >> ${LOGFILE}
-    - echo " " >> ${LOGFILE}
-    - echo "--- Attempting to Copy Files (verbose) ---" >> ${LOGFILE}
-    - cp -av ${REPOPATH}. ${DEPLOYPATH} >> ${LOGFILE} 2>&1
-    - echo " " >> ${LOGFILE}
-    - echo "--- Listing Destination Files AFTER Copy ---" >> ${LOGFILE}
+    - cp -a ${REPOPATH}. ${DEPLOYPATH} 2>> ${LOGFILE}
+    - echo "--- Copy Attempted ---" >> ${LOGFILE}
     - ls -la ${DEPLOYPATH} >> ${LOGFILE}
-    - echo " " >> ${LOGFILE}
-    - echo "--- Deployment Log Finished ---" >> ${LOGFILE}
+    - echo "--- Log End ---" >> ${LOGFILE}
