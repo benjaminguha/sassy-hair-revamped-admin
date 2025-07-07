@@ -1,7 +1,4 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/s1052571/public_html/
-    - /bin/cp -R . $DEPLOYPATH
-    - /bin/find "${DEPLOYPATH}" -type d -exec chmod 755 {} \;
-    - /bin/find "${DEPLOYPATH}" -type f -exec chmod 644 {} \;
+    - cp -R /home/s1052571/repositories/sassy-hair/* /home/s1052571/public_html/
