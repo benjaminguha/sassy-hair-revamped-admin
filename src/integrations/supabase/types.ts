@@ -105,6 +105,39 @@ export type Database = {
         }
         Relationships: []
       }
+      instagram_posts: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          order_index: number
+          post_url: string
+          updated_at: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          order_index?: number
+          post_url: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          order_index?: number
+          post_url?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           created_at: string
@@ -159,6 +192,48 @@ export type Database = {
           key?: string
           updated_at?: string
           value?: string | null
+        }
+        Relationships: []
+      }
+      stylists: {
+        Row: {
+          bio: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          instagram_handle: string | null
+          is_active: boolean
+          name: string
+          order_index: number
+          specialties: string[] | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          instagram_handle?: string | null
+          is_active?: boolean
+          name: string
+          order_index?: number
+          specialties?: string[] | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          instagram_handle?: string | null
+          is_active?: boolean
+          name?: string
+          order_index?: number
+          specialties?: string[] | null
+          title?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

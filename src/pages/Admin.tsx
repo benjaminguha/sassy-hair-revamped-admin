@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,8 @@ import { ArrowLeft } from "lucide-react";
 import CarouselManager from "@/components/admin/CarouselManager";
 import ServicesManager from "@/components/admin/ServicesManager";
 import GalleryManager from "@/components/admin/GalleryManager";
+import StylistsManager from "@/components/admin/StylistsManager";
+import InstagramManager from "@/components/admin/InstagramManager";
 import SettingsManager from "@/components/admin/SettingsManager";
 
 const Admin = () => {
@@ -118,6 +119,10 @@ const Admin = () => {
         return <ServicesManager />;
       case "gallery":
         return <GalleryManager />;
+      case "stylists":
+        return <StylistsManager />;
+      case "instagram":
+        return <InstagramManager />;
       case "settings":
         return <SettingsManager />;
       default:
@@ -164,6 +169,36 @@ const Admin = () => {
                   onClick={() => setCurrentView("gallery")}
                 >
                   Manage Gallery
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Stylists</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Manage salon stylists</p>
+                <Button 
+                  className="mt-4 bg-pink-600 hover:bg-pink-700"
+                  onClick={() => setCurrentView("stylists")}
+                >
+                  Manage Stylists
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Instagram</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Manage Instagram posts</p>
+                <Button 
+                  className="mt-4 bg-pink-600 hover:bg-pink-700"
+                  onClick={() => setCurrentView("instagram")}
+                >
+                  Manage Instagram
                 </Button>
               </CardContent>
             </Card>
@@ -254,6 +289,8 @@ const Admin = () => {
                  currentView === "carousel" ? "Carousel Management" :
                  currentView === "services" ? "Services Management" :
                  currentView === "gallery" ? "Gallery Management" :
+                 currentView === "stylists" ? "Stylists Management" :
+                 currentView === "instagram" ? "Instagram Management" :
                  "Settings Management"}
               </h1>
             </div>

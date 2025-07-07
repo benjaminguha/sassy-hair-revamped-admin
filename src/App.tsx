@@ -10,6 +10,7 @@ import About from "./pages/About";
 import Gallery from "./pages/Gallery";
 import Contact from "./pages/Contact";
 import Collective from "./pages/Collective";
+import Stylists from "./pages/Stylists";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/collective" element={<Collective />} />
+          <Route path="/stylists" element={<Stylists />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/hidden-admin-login" element={<Admin />} />
           <Route path="/admin/dashboard" element={<Admin />} />
