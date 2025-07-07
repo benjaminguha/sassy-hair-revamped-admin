@@ -32,10 +32,20 @@ const Footer = ({ siteSettings }: FooterProps) => {
           
           <div>
             <h4 className="text-lg font-cursive font-semibold text-primary mb-4">Contact Info</h4>
-            <div className="space-y-2 text-gray-300">
-              <p>{siteSettings?.contact_phone || "+1 (555) 123-4567"}</p>
-              <p>{siteSettings?.contact_email || "info@sassyhair.com"}</p>
-              <p>{siteSettings?.address || "123 Beauty Lane, Style City, SC 12345"}</p>
+            <div className="space-y-3 text-gray-300">
+              <div>
+                <p className="font-semibold">Phone:</p>
+                <p>02 6288 9922</p>
+              </div>
+              <div>
+                <p className="font-semibold">Email:</p>
+                <p>appointments@sassyhair.com.au</p>
+              </div>
+              <div>
+                <p className="font-semibold">Locations:</p>
+                <p className="text-sm">Unit 3A, 70 Hodgson Crescent, Pearce ACT 2607</p>
+                <p className="text-sm">Unit 20, 41-43 Liardet Street, Weston ACT 2611</p>
+              </div>
             </div>
           </div>
         </div>
