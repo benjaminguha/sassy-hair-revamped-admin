@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import { Separator } from "./ui/separator";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,7 +22,19 @@ const Navigation = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0">
-              <h1 className="text-2xl font-bold text-pink-600">Sassy Hair</h1>
+              <div className="flex items-center space-x-4">
+                <img 
+                  src="/lovable-uploads/9bfd7e07-a4dd-4d72-a31b-740d29375634.png" 
+                  alt="Sassy Hair" 
+                  className="h-12 w-12"
+                />
+                <Separator orientation="vertical" className="h-8" />
+                <img 
+                  src="/lovable-uploads/1d8798c7-f4f1-44dc-96ea-91064937ace5.png" 
+                  alt="Keune Hair Cosmetics" 
+                  className="h-8"
+                />
+              </div>
             </Link>
           </div>
 
