@@ -23,7 +23,8 @@ const ContactSection = ({ siteSettings }: ContactSectionProps) => {
                 <MapPin className="text-pink-600 mt-1 flex-shrink-0" size={24} />
                 <div>
                   <h4 className="text-lg font-semibold text-gray-900 mb-2">Address</h4>
-                  <p className="text-gray-600">Pearce Location</p>
+                  <p className="text-gray-600">Unit 3A, 70 Hodgson Crescent</p>
+                  <p className="text-gray-600">Pearce ACT 2607</p>
                 </div>
               </div>
 
@@ -49,7 +50,8 @@ const ContactSection = ({ siteSettings }: ContactSectionProps) => {
                 <MapPin className="text-pink-600 mt-1 flex-shrink-0" size={24} />
                 <div>
                   <h4 className="text-lg font-semibold text-gray-900 mb-2">Address</h4>
-                  <p className="text-gray-600">Weston Location</p>
+                  <p className="text-gray-600">Unit 20, 41-43 Liardet Street</p>
+                  <p className="text-gray-600">Weston ACT 2611</p>
                 </div>
               </div>
 
