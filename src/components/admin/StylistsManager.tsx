@@ -5,17 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Upload } from "lucide-react";
 
 const StylistsManager = () => {
   const [newStylist, setNewStylist] = useState({
     name: "",
     title: "",
     bio: "",
-    image_url: "",
+    image_file: null as File | null,
     instagram_handle: "",
     specialties: ""
   });
+  const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -31,13 +32,41 @@ const StylistsManager = () => {
     }
   });
 
+  const uploadImage = async (file: File, folder: string = 'stylists') => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from('salon-images')
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('salon-images')
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
+
   const addStylistMutation = useMutation({
     mutationFn: async (stylistData: typeof newStylist) => {
+      let imageUrl = '';
+      
+      if (stylistData.image_file) {
+        setUploading(true);
+        imageUrl = await uploadImage(stylistData.image_file);
+      }
+
       const specialtiesArray = stylistData.specialties ? stylistData.specialties.split(',').map(s => s.trim()) : [];
       const { error } = await supabase
         .from('stylists')
         .insert([{
-          ...stylistData,
+          name: stylistData.name,
+          title: stylistData.title,
+          bio: stylistData.bio,
+          image_url: imageUrl,
+          instagram_handle: stylistData.instagram_handle,
           specialties: specialtiesArray,
           order_index: stylists.length
         }]);
@@ -45,25 +74,40 @@ const StylistsManager = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stylists'] });
-      setNewStylist({ name: "", title: "", bio: "", image_url: "", instagram_handle: "", specialties: "" });
+      setNewStylist({ name: "", title: "", bio: "", image_file: null, instagram_handle: "", specialties: "" });
+      setUploading(false);
       toast({ title: "Stylist added successfully!" });
+    },
+    onError: () => {
+      setUploading(false);
     }
   });
 
   const updateStylistMutation = useMutation({
-    mutationFn: async ({ id, ...updates }: any) => {
-      if (updates.specialties && typeof updates.specialties === 'string') {
-        updates.specialties = updates.specialties.split(',').map((s: string) => s.trim());
+    mutationFn: async ({ id, field, value, file }: { id: string, field: string, value: string | boolean, file?: File }) => {
+      let updateData: any = { [field]: value };
+      
+      if (file && field === 'image_url') {
+        setUploading(true);
+        const imageUrl = await uploadImage(file);
+        updateData = { image_url: imageUrl };
+      } else if (field === 'specialties' && typeof value === 'string') {
+        updateData.specialties = value.split(',').map((s: string) => s.trim());
       }
+
       const { error } = await supabase
         .from('stylists')
-        .update(updates)
+        .update(updateData)
         .eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stylists'] });
+      setUploading(false);
       toast({ title: "Stylist updated successfully!" });
+    },
+    onError: () => {
+      setUploading(false);
     }
   });
 
@@ -90,7 +134,11 @@ const StylistsManager = () => {
   };
 
   const handleUpdateStylist = (id: string, field: string, value: string | boolean) => {
-    updateStylistMutation.mutate({ id, [field]: value });
+    updateStylistMutation.mutate({ id, field, value });
+  };
+
+  const handleImageUpdate = (id: string, file: File) => {
+    updateStylistMutation.mutate({ id, field: 'image_url', value: '', file });
   };
 
   return (
@@ -119,11 +167,14 @@ const StylistsManager = () => {
             value={newStylist.bio}
             onChange={(e) => setNewStylist({ ...newStylist, bio: e.target.value })}
           />
-          <Input
-            placeholder="Image URL"
-            value={newStylist.image_url}
-            onChange={(e) => setNewStylist({ ...newStylist, image_url: e.target.value })}
-          />
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Select Image (Optional)</label>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setNewStylist({ ...newStylist, image_file: e.target.files?.[0] || null })}
+            />
+          </div>
           <Input
             placeholder="Instagram Handle (without @)"
             value={newStylist.instagram_handle}
@@ -134,9 +185,22 @@ const StylistsManager = () => {
             value={newStylist.specialties}
             onChange={(e) => setNewStylist({ ...newStylist, specialties: e.target.value })}
           />
-          <Button onClick={handleAddStylist} className="bg-pink-600 hover:bg-pink-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Stylist
+          <Button 
+            onClick={handleAddStylist} 
+            className="bg-pink-600 hover:bg-pink-700"
+            disabled={uploading}
+          >
+            {uploading ? (
+              <>
+                <Upload className="w-4 h-4 mr-2 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Stylist
+              </>
+            )}
           </Button>
         </CardContent>
       </Card>
@@ -177,11 +241,17 @@ const StylistsManager = () => {
                 defaultValue={stylist.bio || ""}
                 onBlur={(e) => handleUpdateStylist(stylist.id, 'bio', e.target.value)}
               />
-              <Input
-                placeholder="Image URL"
-                defaultValue={stylist.image_url || ""}
-                onBlur={(e) => handleUpdateStylist(stylist.id, 'image_url', e.target.value)}
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Update Image</label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpdate(stylist.id, file);
+                  }}
+                />
+              </div>
               <Input
                 placeholder="Instagram Handle"
                 defaultValue={stylist.instagram_handle || ""}

@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Save } from "lucide-react";
+import { Trash2, Plus, Upload } from "lucide-react";
 
 const CarouselManager = () => {
-  const [newImage, setNewImage] = useState({ title: "", subtitle: "", image_url: "" });
+  const [newImage, setNewImage] = useState({ title: "", subtitle: "", image_file: null as File | null });
+  const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -25,34 +26,76 @@ const CarouselManager = () => {
     }
   });
 
+  const uploadImage = async (file: File, folder: string = 'carousel') => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from('salon-images')
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('salon-images')
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
+
   const addImageMutation = useMutation({
     mutationFn: async (imageData: typeof newImage) => {
+      let imageUrl = '';
+      
+      if (imageData.image_file) {
+        setUploading(true);
+        imageUrl = await uploadImage(imageData.image_file);
+      }
+
       const { error } = await supabase
         .from('carousel_images')
         .insert([{
-          ...imageData,
+          title: imageData.title,
+          subtitle: imageData.subtitle,
+          image_url: imageUrl,
           order_index: images.length
         }]);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['carouselImages'] });
-      setNewImage({ title: "", subtitle: "", image_url: "" });
+      setNewImage({ title: "", subtitle: "", image_file: null });
+      setUploading(false);
       toast({ title: "Image added successfully!" });
+    },
+    onError: () => {
+      setUploading(false);
     }
   });
 
   const updateImageMutation = useMutation({
-    mutationFn: async ({ id, ...updates }: any) => {
+    mutationFn: async ({ id, field, value, file }: { id: string, field: string, value: string | boolean, file?: File }) => {
+      let updateData: any = { [field]: value };
+      
+      if (file && field === 'image_url') {
+        setUploading(true);
+        const imageUrl = await uploadImage(file);
+        updateData = { image_url: imageUrl };
+      }
+
       const { error } = await supabase
         .from('carousel_images')
-        .update(updates)
+        .update(updateData)
         .eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['carouselImages'] });
+      setUploading(false);
       toast({ title: "Image updated successfully!" });
+    },
+    onError: () => {
+      setUploading(false);
     }
   });
 
@@ -71,15 +114,19 @@ const CarouselManager = () => {
   });
 
   const handleAddImage = () => {
-    if (!newImage.title || !newImage.image_url) {
-      toast({ title: "Please fill in title and image URL", variant: "destructive" });
+    if (!newImage.title || !newImage.image_file) {
+      toast({ title: "Please fill in title and select an image file", variant: "destructive" });
       return;
     }
     addImageMutation.mutate(newImage);
   };
 
   const handleUpdateImage = (id: string, field: string, value: string | boolean) => {
-    updateImageMutation.mutate({ id, [field]: value });
+    updateImageMutation.mutate({ id, field, value });
+  };
+
+  const handleImageUpdate = (id: string, file: File) => {
+    updateImageMutation.mutate({ id, field: 'image_url', value: '', file });
   };
 
   return (
@@ -102,14 +149,30 @@ const CarouselManager = () => {
             value={newImage.subtitle}
             onChange={(e) => setNewImage({ ...newImage, subtitle: e.target.value })}
           />
-          <Input
-            placeholder="Image URL"
-            value={newImage.image_url}
-            onChange={(e) => setNewImage({ ...newImage, image_url: e.target.value })}
-          />
-          <Button onClick={handleAddImage} className="bg-pink-600 hover:bg-pink-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Image
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Select Image</label>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setNewImage({ ...newImage, image_file: e.target.files?.[0] || null })}
+            />
+          </div>
+          <Button 
+            onClick={handleAddImage} 
+            className="bg-pink-600 hover:bg-pink-700"
+            disabled={uploading}
+          >
+            {uploading ? (
+              <>
+                <Upload className="w-4 h-4 mr-2 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Image
+              </>
+            )}
           </Button>
         </CardContent>
       </Card>
@@ -144,11 +207,17 @@ const CarouselManager = () => {
                 defaultValue={image.subtitle || ""}
                 onBlur={(e) => handleUpdateImage(image.id, 'subtitle', e.target.value)}
               />
-              <Input
-                placeholder="Image URL"
-                defaultValue={image.image_url}
-                onBlur={(e) => handleUpdateImage(image.id, 'image_url', e.target.value)}
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Update Image</label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpdate(image.id, file);
+                  }}
+                />
+              </div>
               <div className="flex items-center space-x-2">
                 <label className="text-sm">Active:</label>
                 <input

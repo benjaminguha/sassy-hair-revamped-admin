@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -5,14 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Upload } from "lucide-react";
 
 const InstagramManager = () => {
   const [newPost, setNewPost] = useState({
     post_url: "",
-    image_url: "",
+    image_file: null as File | null,
     caption: ""
   });
+  const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -28,34 +30,76 @@ const InstagramManager = () => {
     }
   });
 
+  const uploadImage = async (file: File, folder: string = 'instagram') => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from('salon-images')
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('salon-images')
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
+
   const addPostMutation = useMutation({
     mutationFn: async (postData: typeof newPost) => {
+      let imageUrl = '';
+      
+      if (postData.image_file) {
+        setUploading(true);
+        imageUrl = await uploadImage(postData.image_file);
+      }
+
       const { error } = await supabase
         .from('instagram_posts')
         .insert([{
-          ...postData,
+          post_url: postData.post_url,
+          image_url: imageUrl,
+          caption: postData.caption,
           order_index: posts.length
         }]);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instagramPosts'] });
-      setNewPost({ post_url: "", image_url: "", caption: "" });
+      setNewPost({ post_url: "", image_file: null, caption: "" });
+      setUploading(false);
       toast({ title: "Instagram post added successfully!" });
+    },
+    onError: () => {
+      setUploading(false);
     }
   });
 
   const updatePostMutation = useMutation({
-    mutationFn: async ({ id, ...updates }: any) => {
+    mutationFn: async ({ id, field, value, file }: { id: string, field: string, value: string | boolean, file?: File }) => {
+      let updateData: any = { [field]: value };
+      
+      if (file && field === 'image_url') {
+        setUploading(true);
+        const imageUrl = await uploadImage(file);
+        updateData = { image_url: imageUrl };
+      }
+
       const { error } = await supabase
         .from('instagram_posts')
-        .update(updates)
+        .update(updateData)
         .eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instagramPosts'] });
+      setUploading(false);
       toast({ title: "Instagram post updated successfully!" });
+    },
+    onError: () => {
+      setUploading(false);
     }
   });
 
@@ -82,7 +126,11 @@ const InstagramManager = () => {
   };
 
   const handleUpdatePost = (id: string, field: string, value: string | boolean) => {
-    updatePostMutation.mutate({ id, [field]: value });
+    updatePostMutation.mutate({ id, field, value });
+  };
+
+  const handleImageUpdate = (id: string, file: File) => {
+    updatePostMutation.mutate({ id, field: 'image_url', value: '', file });
   };
 
   return (
@@ -100,20 +148,36 @@ const InstagramManager = () => {
             value={newPost.post_url}
             onChange={(e) => setNewPost({ ...newPost, post_url: e.target.value })}
           />
-          <Input
-            placeholder="Image URL (optional - for preview)"
-            value={newPost.image_url}
-            onChange={(e) => setNewPost({ ...newPost, image_url: e.target.value })}
-          />
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Upload Preview Image (Optional)</label>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setNewPost({ ...newPost, image_file: e.target.files?.[0] || null })}
+            />
+          </div>
           <textarea
             className="w-full min-h-20 p-3 border border-gray-300 rounded-md"
             placeholder="Caption (optional)"
             value={newPost.caption}
             onChange={(e) => setNewPost({ ...newPost, caption: e.target.value })}
           />
-          <Button onClick={handleAddPost} className="bg-pink-600 hover:bg-pink-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Post
+          <Button 
+            onClick={handleAddPost} 
+            className="bg-pink-600 hover:bg-pink-700"
+            disabled={uploading}
+          >
+            {uploading ? (
+              <>
+                <Upload className="w-4 h-4 mr-2 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Post
+              </>
+            )}
           </Button>
         </CardContent>
       </Card>
@@ -143,11 +207,17 @@ const InstagramManager = () => {
                 defaultValue={post.post_url || ""}
                 onBlur={(e) => handleUpdatePost(post.id, 'post_url', e.target.value)}
               />
-              <Input
-                placeholder="Image URL"
-                defaultValue={post.image_url || ""}
-                onBlur={(e) => handleUpdatePost(post.id, 'image_url', e.target.value)}
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Update Preview Image</label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpdate(post.id, file);
+                  }}
+                />
+              </div>
               <textarea
                 className="w-full min-h-16 p-2 border border-gray-300 rounded-md text-sm"
                 placeholder="Caption"
