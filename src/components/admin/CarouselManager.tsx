@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,7 +78,7 @@ const CarouselManager = () => {
     addImageMutation.mutate(newImage);
   };
 
-  const handleUpdateImage = (id: string, field: string, value: string) => {
+  const handleUpdateImage = (id: string, field: string, value: string | boolean) => {
     updateImageMutation.mutate({ id, [field]: value });
   };
 
