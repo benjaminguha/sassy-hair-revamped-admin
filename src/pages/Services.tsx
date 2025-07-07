@@ -127,13 +127,13 @@ const Services = () => {
                       {category.services.map((service, index) => (
                         <div key={index} className="flex justify-between items-start border-b border-gray-100 pb-3 last:border-b-0">
                           <div className="flex-1">
-                            <h3 className="font-medium text-gray-900">{service.name}</h3>
+                            <h3 className="font-medium text-gray-900 font-sans">{service.name}</h3>
                             {service.description && (
-                              <p className="text-sm text-gray-600 mt-1">({service.description})</p>
+                              <p className="text-sm text-gray-600 mt-1 font-sans">({service.description})</p>
                             )}
                           </div>
                           <div className="ml-4 text-right">
-                            <span className="font-semibold text-pink-600">{service.price}</span>
+                            <span className="font-semibold text-pink-600 font-sans">{service.price}</span>
                           </div>
                         </div>
                       ))}
