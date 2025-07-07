@@ -11,10 +11,21 @@ const Footer = ({ siteSettings }: FooterProps) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-2xl font-cursive font-bold text-pink-400 mb-4">Sassy Hair</h3>
-            <p className="text-gray-300">
-              {siteSettings?.site_description || "Professional hair styling and beauty services"}
+            <h3 className="text-2xl font-cursive font-bold text-pink-400 mb-4">Sassy Hair Salon | The Best Hairdressers & Stylists in Canberra</h3>
+            <p className="text-gray-300 mb-4">
+              Some Filler Text
             </p>
+            <p className="text-gray-400 text-sm mb-2">
+              © 2022 Sassy Hair. All rights reserved.
+            </p>
+            <p className="text-gray-400 text-sm mb-4">
+              Privacy Policy | Images courtesy of Keune
+            </p>
+            <div className="text-gray-400 text-xs space-y-1">
+              <p>* Prices listed are starting prices, subject to hair length. Finishing service not included.</p>
+              <p>All technical services must include a finishing service to guarantee results.</p>
+              <p>** Regrowth of no more than 6 weeks</p>
+            </div>
           </div>
           
           <div>
