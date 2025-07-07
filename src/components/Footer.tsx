@@ -42,8 +42,11 @@ const Footer = ({ siteSettings }: FooterProps) => {
                 <p>appointments@sassyhair.com.au</p>
               </div>
               <div>
-                <p className="font-semibold">Locations:</p>
+                <p className="font-semibold">Sassy Hair Pearce:</p>
                 <p className="text-sm">Unit 3A, 70 Hodgson Crescent, Pearce ACT 2607</p>
+              </div>
+              <div>
+                <p className="font-semibold">The Sassy Collective Weston:</p>
                 <p className="text-sm">Unit 20, 41-43 Liardet Street, Weston ACT 2611</p>
               </div>
             </div>
