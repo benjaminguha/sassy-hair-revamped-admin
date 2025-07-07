@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -93,7 +92,7 @@ const AboutSection = () => {
             ) : (
               <div className="w-full h-full bg-gradient-to-r from-pink-400 to-purple-600 flex items-center justify-center">
                 <div className="text-center text-white">
-                  <h3 className="text-2xl font-bold">Sassy Hair</h3>
+                  <h3 className="text-2xl font-cursive font-bold">Sassy Hair</h3>
                   <p className="text-lg">Professional styling</p>
                 </div>
               </div>
@@ -102,7 +101,7 @@ const AboutSection = () => {
 
           {/* Content on the right */}
           <div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">We're Changing the Way People Think About Hair</h2>
+            <h2 className="text-4xl font-cursive font-bold text-gray-900 mb-6">We're Changing the Way People Think About Hair</h2>
             <p className="text-lg text-gray-600 mb-6">
               Styles, trends, and fashions are forever changing. At Sassy Hair, we aim to combine the very best Keune products with our highly skilled and trained stylists to remain at the very cutting edge.
             </p>
@@ -126,7 +125,7 @@ const AboutSection = () => {
               Our aim is to create a warm, welcoming space allowing you to relax in comfort. We've worked hard to build a highly skilled team, passionate about their craft who enjoy bringing about the change you're looking for.
             </p>
             <div className="text-center">
-              <p className="text-xl font-semibold text-gray-900 mb-2">Bec & Dan</p>
+              <p className="text-xl font-cursive font-semibold text-gray-900 mb-2">Bec & Dan</p>
               <p className="text-gray-600">Co-Founders</p>
             </div>
           </div>
@@ -152,7 +151,7 @@ const AboutSection = () => {
 
         {/* Keune Section */}
         <div className="text-center bg-gray-50 rounded-lg p-12">
-          <h3 className="text-3xl font-bold text-gray-900 mb-6">KEUNE, THROUGH & THROUGH</h3>
+          <h3 className="text-3xl font-cursive font-bold text-gray-900 mb-6">KEUNE, THROUGH & THROUGH</h3>
           <p className="text-lg text-gray-600 mb-6 max-w-4xl mx-auto">
             Founded in 1922, family-owned and operated Keune symbolises many of the qualities we promote through our team – love, passion, skill, honesty, open communication, social responsibility, and trust.
           </p>

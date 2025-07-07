@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 
 interface FooterProps {
@@ -11,14 +10,14 @@ const Footer = ({ siteSettings }: FooterProps) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-2xl font-bold text-pink-400 mb-4">Sassy Hair</h3>
+            <h3 className="text-2xl font-cursive font-bold text-pink-400 mb-4">Sassy Hair</h3>
             <p className="text-gray-300">
               {siteSettings?.site_description || "Professional hair styling and beauty services"}
             </p>
           </div>
           
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-lg font-cursive font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li><Link to="/" className="text-gray-300 hover:text-pink-400 transition-colors">Home</Link></li>
               <li><Link to="/services" className="text-gray-300 hover:text-pink-400 transition-colors">Services</Link></li>
@@ -30,7 +29,7 @@ const Footer = ({ siteSettings }: FooterProps) => {
           </div>
           
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
+            <h4 className="text-lg font-cursive font-semibold mb-4">Contact Info</h4>
             <div className="space-y-2 text-gray-300">
               <p>{siteSettings?.contact_phone || "+1 (555) 123-4567"}</p>
               <p>{siteSettings?.contact_email || "info@sassyhair.com"}</p>
