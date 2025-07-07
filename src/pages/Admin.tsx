@@ -5,6 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft } from "lucide-react";
+import CarouselManager from "@/components/admin/CarouselManager";
+import ServicesManager from "@/components/admin/ServicesManager";
+import GalleryManager from "@/components/admin/GalleryManager";
+import SettingsManager from "@/components/admin/SettingsManager";
 
 const Admin = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +17,7 @@ const Admin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentView, setCurrentView] = useState("dashboard");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -27,7 +33,6 @@ const Admin = () => {
       }
 
       setUser(session.user);
-      console.log("Current user:", session.user);
 
       // Check admin status
       const { data: adminUser, error } = await supabase
@@ -37,12 +42,8 @@ const Admin = () => {
         .eq('is_active', true)
         .single();
 
-      console.log("Admin check result:", { adminUser, error });
-
       if (!error && adminUser) {
         setIsAdmin(true);
-      } else {
-        console.log("Admin check failed:", error);
       }
     } catch (err) {
       console.error("Auth check failed:", err);
@@ -54,38 +55,29 @@ const Admin = () => {
     setIsLoading(true);
 
     try {
-      console.log("Attempting login with:", email);
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        console.error("Login error:", error);
         throw error;
       }
 
       if (data.user) {
-        console.log("Login successful, user:", data.user);
-        
-        // Check admin status with detailed logging
+        // Check admin status
         const { data: adminUser, error: adminError } = await supabase
           .from('admin_users')
           .select('*')
           .eq('user_id', data.user.id)
           .eq('is_active', true);
 
-        console.log("Admin lookup result:", { adminUser, adminError, userId: data.user.id });
-
         if (adminError) {
-          console.error("Admin lookup error:", adminError);
           await supabase.auth.signOut();
           throw new Error(`Database error: ${adminError.message}`);
         }
 
         if (!adminUser || adminUser.length === 0) {
-          console.log("No admin user found for ID:", data.user.id);
           await supabase.auth.signOut();
           throw new Error("Access denied. Admin privileges required.");
         }
@@ -99,7 +91,6 @@ const Admin = () => {
         });
       }
     } catch (error: any) {
-      console.error("Login process error:", error);
       toast({
         title: "Login failed",
         description: error.message,
@@ -116,6 +107,84 @@ const Admin = () => {
     setIsAdmin(false);
     setEmail("");
     setPassword("");
+    setCurrentView("dashboard");
+  };
+
+  const renderCurrentView = () => {
+    switch (currentView) {
+      case "carousel":
+        return <CarouselManager />;
+      case "services":
+        return <ServicesManager />;
+      case "gallery":
+        return <GalleryManager />;
+      case "settings":
+        return <SettingsManager />;
+      default:
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Carousel Images</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Manage hero carousel images</p>
+                <Button 
+                  className="mt-4 bg-pink-600 hover:bg-pink-700"
+                  onClick={() => setCurrentView("carousel")}
+                >
+                  Manage Carousel
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Services</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Manage salon services</p>
+                <Button 
+                  className="mt-4 bg-pink-600 hover:bg-pink-700"
+                  onClick={() => setCurrentView("services")}
+                >
+                  Manage Services
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Gallery</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Manage photo gallery</p>
+                <Button 
+                  className="mt-4 bg-pink-600 hover:bg-pink-700"
+                  onClick={() => setCurrentView("gallery")}
+                >
+                  Manage Gallery
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Settings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Manage site settings</p>
+                <Button 
+                  className="mt-4 bg-pink-600 hover:bg-pink-700"
+                  onClick={() => setCurrentView("settings")}
+                >
+                  Manage Settings
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        );
+    }
   };
 
   // Show login form if not authenticated or not admin
@@ -169,7 +238,25 @@ const Admin = () => {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-bold text-pink-600">Admin Dashboard</h1>
+            <div className="flex items-center space-x-4">
+              {currentView !== "dashboard" && (
+                <Button
+                  variant="ghost"
+                  onClick={() => setCurrentView("dashboard")}
+                  className="text-pink-600"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Dashboard
+                </Button>
+              )}
+              <h1 className="text-2xl font-bold text-pink-600">
+                {currentView === "dashboard" ? "Admin Dashboard" : 
+                 currentView === "carousel" ? "Carousel Management" :
+                 currentView === "services" ? "Services Management" :
+                 currentView === "gallery" ? "Gallery Management" :
+                 "Settings Management"}
+              </h1>
+            </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-600">Welcome, {user?.email}</span>
               <Button onClick={handleLogout} variant="outline">
@@ -181,55 +268,7 @@ const Admin = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Carousel Images</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Manage hero carousel images</p>
-              <Button className="mt-4 bg-pink-600 hover:bg-pink-700">
-                Manage Carousel
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Services</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Manage salon services</p>
-              <Button className="mt-4 bg-pink-600 hover:bg-pink-700">
-                Manage Services
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Gallery</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Manage photo gallery</p>
-              <Button className="mt-4 bg-pink-600 hover:bg-pink-700">
-                Manage Gallery
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Manage site settings</p>
-              <Button className="mt-4 bg-pink-600 hover:bg-pink-700">
-                Manage Settings
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+        {renderCurrentView()}
       </main>
     </div>
   );
