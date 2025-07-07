@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 
 interface FooterProps {
@@ -17,7 +18,7 @@ const Footer = ({ siteSettings }: FooterProps) => {
           </div>
           
           <div>
-            <h4 className="text-lg font-cursive font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-lg font-cursive font-semibold text-primary mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li><Link to="/" className="text-gray-300 hover:text-pink-400 transition-colors">Home</Link></li>
               <li><Link to="/services" className="text-gray-300 hover:text-pink-400 transition-colors">Services</Link></li>
@@ -29,7 +30,7 @@ const Footer = ({ siteSettings }: FooterProps) => {
           </div>
           
           <div>
-            <h4 className="text-lg font-cursive font-semibold mb-4">Contact Info</h4>
+            <h4 className="text-lg font-cursive font-semibold text-primary mb-4">Contact Info</h4>
             <div className="space-y-2 text-gray-300">
               <p>{siteSettings?.contact_phone || "+1 (555) 123-4567"}</p>
               <p>{siteSettings?.contact_email || "info@sassyhair.com"}</p>

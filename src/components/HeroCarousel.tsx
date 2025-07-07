@@ -41,7 +41,7 @@ const HeroCarousel = () => {
     return (
       <section id="home" className="relative h-screen flex items-center justify-center bg-gradient-to-r from-pink-400 to-purple-600">
         <div className="text-center text-white">
-          <h1 className="text-5xl font-bold mb-4">Welcome to Sassy Hair</h1>
+          <h1 className="text-5xl font-cursive font-bold mb-4">Welcome to Sassy Hair</h1>
           <p className="text-xl">Professional styling for every occasion</p>
         </div>
       </section>
@@ -66,7 +66,7 @@ const HeroCarousel = () => {
             <div className="absolute inset-0 bg-black/40" />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center text-white px-4">
-                <h1 className="text-5xl md:text-6xl font-bold mb-4 animate-fade-in">
+                <h1 className="text-5xl md:text-6xl font-cursive font-bold mb-4 animate-fade-in">
                   {image.title}
                 </h1>
                 <p className="text-xl md:text-2xl animate-fade-in">
