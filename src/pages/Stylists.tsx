@@ -44,65 +44,72 @@ const Stylists = () => {
               <p className="text-xl text-gray-600">Talented professionals dedicated to making you look and feel amazing</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {stylists.map((stylist) => (
-                <div
-                  key={stylist.id}
-                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                >
-                  {stylist.image_url && (
-                    <div className="aspect-square overflow-hidden">
-                      <img
-                        src={stylist.image_url}
-                        alt={stylist.name}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                  )}
-                  
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">{stylist.name}</h3>
-                    {stylist.title && (
-                      <p className="text-pink-600 font-medium mb-3">{stylist.title}</p>
+            {stylists.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-600 text-lg">Our stylists will be featured here soon. Please check back later!</p>
+                <p className="text-gray-500 text-sm mt-2">Contact us directly to book an appointment with any of our talented stylists.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {stylists.map((stylist) => (
+                  <div
+                    key={stylist.id}
+                    className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                  >
+                    {stylist.image_url && (
+                      <div className="aspect-square overflow-hidden">
+                        <img
+                          src={stylist.image_url}
+                          alt={stylist.name}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
                     )}
                     
-                    {stylist.bio && (
-                      <p className="text-gray-600 mb-4 text-sm leading-relaxed">{stylist.bio}</p>
-                    )}
-                    
-                    {stylist.specialties && stylist.specialties.length > 0 && (
-                      <div className="mb-4">
-                        <h4 className="text-sm font-semibold text-gray-800 mb-2">Specialties:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {stylist.specialties.map((specialty, index) => (
-                            <span
-                              key={index}
-                              className="px-3 py-1 bg-pink-100 text-pink-700 text-xs rounded-full"
-                            >
-                              {specialty}
-                            </span>
-                          ))}
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">{stylist.name}</h3>
+                      {stylist.title && (
+                        <p className="text-pink-600 font-medium mb-3">{stylist.title}</p>
+                      )}
+                      
+                      {stylist.bio && (
+                        <p className="text-gray-600 mb-4 text-sm leading-relaxed">{stylist.bio}</p>
+                      )}
+                      
+                      {stylist.specialties && stylist.specialties.length > 0 && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold text-gray-800 mb-2">Specialties:</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {stylist.specialties.map((specialty, index) => (
+                              <span
+                                key={index}
+                                className="px-3 py-1 bg-pink-100 text-pink-700 text-xs rounded-full"
+                              >
+                                {specialty}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    
-                    {stylist.instagram_handle && (
-                      <div className="flex items-center justify-center">
-                        <a
-                          href={`https://instagram.com/${stylist.instagram_handle}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center space-x-2 text-pink-600 hover:text-pink-700 transition-colors"
-                        >
-                          <Instagram className="w-4 h-4" />
-                          <span className="text-sm">@{stylist.instagram_handle}</span>
-                        </a>
-                      </div>
-                    )}
+                      )}
+                      
+                      {stylist.instagram_handle && (
+                        <div className="flex items-center justify-center">
+                          <a
+                            href={`https://instagram.com/${stylist.instagram_handle}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center space-x-2 text-pink-600 hover:text-pink-700 transition-colors"
+                          >
+                            <Instagram className="w-4 h-4" />
+                            <span className="text-sm">@{stylist.instagram_handle}</span>
+                          </a>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </div>
