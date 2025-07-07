@@ -42,7 +42,7 @@ const HeroCarousel = () => {
       <section id="home" className="relative h-screen flex items-center justify-center bg-gradient-to-r from-pink-400 to-purple-600">
         <div className="absolute inset-0 bg-black/40" />
         <div className="relative text-center text-white px-4 z-10">
-          <h1 className="text-5xl md:text-6xl font-cursive font-bold mb-4 text-primary animate-fade-in">
+          <h1 className="text-5xl md:text-6xl font-cursive font-bold mb-4 text-white animate-fade-in">
             We are Sassy!
           </h1>
           <p className="text-xl md:text-2xl animate-fade-in">
@@ -79,7 +79,7 @@ const HeroCarousel = () => {
       {/* Static text overlay */}
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <div className="text-center text-white px-4">
-          <h1 className="text-5xl md:text-6xl font-cursive font-bold mb-4 text-primary animate-fade-in">
+          <h1 className="text-5xl md:text-6xl font-cursive font-bold mb-4 text-white animate-fade-in">
             We are Sassy!
           </h1>
           <p className="text-xl md:text-2xl animate-fade-in">
