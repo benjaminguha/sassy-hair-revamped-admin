@@ -59,12 +59,6 @@ const Footer = ({ siteSettings }: FooterProps) => {
             </div>
           </div>
         </div>
-        
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-400">
-            © 2024 Sassy Hair Salon. All rights reserved.
-          </p>
-        </div>
       </div>
     </footer>
   );
