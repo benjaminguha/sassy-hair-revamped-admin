@@ -97,7 +97,7 @@ const Navigation = () => {
               Contact
             </Link>
             <a
-              href="https://www.fresha.com/a/sassy-hair-pearce-woden-1-phillip-law-street-4krvfhws"
+              href="https://app.salonrunner.com/customer/login.htm?id=27134"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"

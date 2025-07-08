@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import sassy3 from "../photos/sassy3.jpg";
+import sassy4 from "../photos/sassy4.jpg";
 
 const AboutSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -135,14 +137,14 @@ const AboutSection = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                src={sassy3}
                 alt="Salon collage 1"
                 className="rounded-lg shadow-lg w-full h-48 object-cover"
               />
             </div>
             <div className="relative mt-8">
               <img
-                src="https://images.unsplash.com/photo-1562322140-8baeececf3df?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                src={sassy4}
                 alt="Salon collage 2"
                 className="rounded-lg shadow-lg w-full h-48 object-cover"
               />
