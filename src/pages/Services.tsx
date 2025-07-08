@@ -98,7 +98,9 @@ const Services = () => {
               <h1 className="text-4xl font-bold text-gray-900 mb-8">Services</h1>
               
               <div className="text-left space-y-4 mb-12 text-gray-700">
-                <p className="font-semibold">All prices apply to Sassy Hair Pearce and are a starting point...</p>
+                <p className="font-semibold">All prices listed apply to Sassy Hair Pearce and are a starting point. Pricing will
+be dependent on your hair’s condition, the amount of time taken and product used,
+and the level of expertise required to achieve your desired look.</p>
                 
                 <div>
                   <p className="font-semibold mb-2">Our services are based on the following length types:</p>
@@ -110,9 +112,13 @@ const Services = () => {
                   </ul>
                 </div>
                 
-                <p>Quotes cannot be given over the phone...</p>
-                <p>All services can be quoted before the commencement...</p>
-                <p>Stylists at The Sassy Collective set their own prices...</p>
+                <p>Quotes can not be given over the phone. We do however, offer appointments for a
+complimentary in-salon client consultation to discuss your options.</p>
+                <p>All services will can be quoted before the commencement of a service. The prices
+listed include GST and are subject to change without notification.</p>
+                <p>Please note that due to the nature of their independence, any stylists working at The
+Sassy Collective are responsible for setting their own services and pricing. Please
+speak with them directly regarding quotes for their services.</p>
               </div>
             </div>
 
